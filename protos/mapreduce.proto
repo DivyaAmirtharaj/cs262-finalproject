@@ -6,4 +6,5 @@ message Empty {
 }
 
 service MapReduce {
+    // rpc server_check_is_primary (Empty) returns (Outcome);
 } 
