@@ -5,6 +5,19 @@ package grpc;
 message Empty {
 }
 
+enum TaskType{
+    idle = 0;
+    map = 1;
+    reduce = 2;
+    shut_down = 3;
+}
+
+message Task {
+    TaskType task_type = 1;
+    int64 id = 2;
+}
+
+
 service MapReduce {
     // rpc server_check_is_primary (Empty) returns (Outcome);
 } 
