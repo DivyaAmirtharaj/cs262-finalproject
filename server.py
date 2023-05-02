@@ -6,6 +6,7 @@ import grpc
 import time
 import argparse
 import glob
+from collections import defaultdict
 
 class Server(pb2_grpc.MapReduceServicer):
     def __init__(self, num_map_tasks, num_red_asks):
@@ -20,7 +21,7 @@ class Server(pb2_grpc.MapReduceServicer):
         self.split_data = self.split_data_for_map(num_map_tasks)
     
     def split_data_for_map(self, num_map_tasks):
-        data_by_id = {}
+        data_by_id = defaultdict(list)
         data_filenames = glob.glob(f'{self.directory}/*')
         for i, filename in enumerate(data_filenames):
             id = i % num_map_tasks
@@ -42,7 +43,7 @@ class Server(pb2_grpc.MapReduceServicer):
         if self.cur_task_type == pb2.TaskType.map:
             return pb2.Task(type=pb2.TaskType.map,
                             id=task_id,
-                            data=self.split_data[task_id]
+                            data=self.split_data[task_id],
                             M=self.num_map_tasks
                             )
         else:
@@ -76,12 +77,12 @@ class Server(pb2_grpc.MapReduceServicer):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-N', dest='N', type=int, required=True, help='number of map tasks')
-    parser.add_argument('-M', dest='M', type=int, required=True, help='number of reduce tasks')
+    parser.add_argument('-M', dest='M', type=int, required=True, help='number of map tasks')
+    parser.add_argument('-N', dest='N', type=int, required=True, help='number of reduce tasks')
     args = parser.parse_args()
 
-    num_map_tasks = args.N 
-    num_red_tasks = args.M 
+    num_map_tasks = args.M
+    num_red_tasks = args.N
 
     address = "localhost"
     port = 50050
