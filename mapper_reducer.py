@@ -18,13 +18,13 @@ class Mapper():
 		for filename in filenames:
 			with open(filename, 'r') as file:
 				for word in file.read().split():
-	                bucket_id = ord(word[0]) % M
+					bucket_id = ord(word[0]) % M
 
-	                if filename not in self._files:
+					if filename not in self._files:
 						self.files[filename] = open(filename, 'a')
 
-	                words = self.files(f'{map_dirs}/mr-{map_id}-{bucket_id}')
-	                words.write(f'{word}\n')
+					words = self.files(f'{map_dirs}/mr-{map_id}-{bucket_id}')
+					words.write(f'{word}\n')
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
