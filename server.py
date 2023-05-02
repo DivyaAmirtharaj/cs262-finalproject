@@ -5,6 +5,7 @@ from threading import Lock
 import grpc
 import time
 import argparse
+import glob
 
 class Server(pb2_grpc.MapReduceServicer):
     def __init__(self, num_map_tasks, num_red_asks):
@@ -17,11 +18,12 @@ class Server(pb2_grpc.MapReduceServicer):
         self.start_time = time.time()
         self.split_data = {}
     
-    def chunk_data(self):
+    def split_data_for_map(self):
+
         
     
     def get_map_or_reduce_task(self):
-        id = self.task_id
+        task_id = self.task_id
         self.task_id += 1
 
         if self.cur_task_type == pb2.TaskType.map:
@@ -29,18 +31,18 @@ class Server(pb2_grpc.MapReduceServicer):
         else:
             num_tasks = self.num_red_tasks
 
-        if id == num_tasks - 1:
+        if task_id == num_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
 
         if self.cur_task_type == pb2.TaskType.map:
             return pb2.Task(type=pb2.TaskType.map,
-                            id=id,
-                            data=self.split_data[id]
+                            id=task_id,
+                            data=self.split_data[task_id]
                             M=self.num_map_tasks
                             )
         else:
             return pb2.Task(type=pb2.TaskType.map,
-                            id=id,
+                            id=task_id,
                             )
     
     def get_worker_task(self, request: pb2.Empty, context):

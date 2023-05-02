@@ -11,7 +11,7 @@ class Mapper():
 
 	# pass set of filenames 
 	def map(self, map_id, filenames, M): 
-		os.makedirs(map_dirs)
+		os.makedirs('map_dirs')
 		
 		for filename in filenames:
 			with open(filename, 'r') as file:
@@ -29,5 +29,28 @@ class Mapper():
 			stub.FinishMap(Empty())
 
 class Reducer():
-	os.makedirs('out')
-	for file in glob.glob(f'{INTERMEDIATE_DIR}/mr-*-{bucket_id}')
+
+
+	def count_bucket(self, bucket_id):
+		counter = {}
+
+		for file in glob.glob(f'map_dirs/mr-*-{bucket_id}'):
+			with open(file) as f:
+				for word in f.readlines():
+					w = word.strip()
+					if w not in counter:
+						counter[w] = 0
+					counter[w] += 1
+
+		return counter
+
+	def reduce(self, bucket_id):
+		os.makedirs('out')
+		counts = self.count_bucket(bucket_id)
+		with open(f'out/out-{bucket_id}', 'a') as out:
+			for key, val in counts.items():
+				out.write(f'{key} {val}\n')
+
+		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
+            stub = DriverServiceStub(channel)
+            stub.FinishReduce(Empty())
