@@ -21,7 +21,8 @@ class Mapper():
 		
 		for filename in filenames:
 			with open(filename, 'r') as file:
-				for word in file.read().split():
+				text = file.read()
+				for word in text.split():
 					bucket_id = ord(word[0]) % M
 
 					new_file = f'map_dirs/mr-{map_id}-{bucket_id}'
