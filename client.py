@@ -22,11 +22,11 @@ class Client():
         while True:
             try:
                 task = self._ask_task()
-                if task.type == pb2.TaskType.map:
+                if task.task_type == pb2.TaskType.map:
                     self.mapper.map(task.id, task.data, task.M)
-                elif task.type == pb2.TaskType.reduce:
+                elif task.task_type == pb2.TaskType.reduce:
                     self.reducer.reduce(task.id)
-                elif task.type == pb2.TaskType.shut_down:
+                elif task.task_type == pb2.TaskType.shut_down:
                     pass
                 else:
                     return
