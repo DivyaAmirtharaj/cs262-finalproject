@@ -15,9 +15,10 @@ class Server(pb2_grpc.MapReduceServicer):
         self.task_id = 0
         self.cur_task_type = pb2.TaskType.map
         self.start_time = time.time()
+        self.split_data = {}
     
-    def chunk_data():
-        
+    def chunk_data(self):
+        pass
     
     def get_map_or_reduce_task(self):
         id = self.task_id
@@ -34,6 +35,8 @@ class Server(pb2_grpc.MapReduceServicer):
         if self.cur_task_type == pb2.TaskType.map:
             return pb2.Task(type=pb2.TaskType.map,
                             id=id,
+                            data=self.split_data[id]
+                            M=self.num_map_tasks
                             )
         else:
             return pb2.Task(type=pb2.TaskType.map,
@@ -45,17 +48,6 @@ class Server(pb2_grpc.MapReduceServicer):
             return self.get_map_or_reduce_task()
     
     def finish_map_task(self, request: pb2.Empty, context):
-        with self.lock:
-            self.task_count += 1
-            
-            if self.task_count == self.num_map_tasks:
-                self.cur_task_type = pb2.TaskType.map
-                self.task_id = 0
-                self.task_count = 0
-            
-            return pb2.Empty()
-    
-    def finish_reduce_task(self, request: pb2.Empty, context):
         with self.lock:
             self.task_count += 1
             

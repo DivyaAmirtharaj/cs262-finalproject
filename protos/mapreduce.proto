@@ -15,10 +15,13 @@ enum TaskType {
 message Task {
     TaskType task_type = 1;
     int64 id = 2;
-    
+    int64 M = 3;
+    repeated string data = 4;
 }
 
 
 service MapReduce {
-    // rpc server_check_is_primary (Empty) returns (Outcome);
+    rpc get_worker_task (Empty) returns (Task);
+    rpc finish_map_task (Empty) returns (Task);
+    rpc finish_reduce_task (Empty) returns (Task);
 } 

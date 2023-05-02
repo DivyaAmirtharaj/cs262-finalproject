@@ -15,15 +15,15 @@ class Client():
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = DriverServiceStub(channel)
-			task = stub.AskTask(Empty())
+			task = stub.get_worker_task(pb2.Empty())
 		return task
 
     def run(self) -> None:
         while True:
             try:
             	task = self.ask_task()
-            	if task.type == TaskType.Map:
-            		self.mapper.map(task.id, task.filenames, task.M)
+            	if task.type == pb2.TaskType.map:
+            		self.mapper.map(task.id, task.data, task.M)
 
 
 
@@ -49,6 +49,6 @@ class Mapper():
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = DriverServiceStub(channel)
-			stub.FinishMap(Empty())
+			stub.finish_map_task(pb2.Empty())
 
 
