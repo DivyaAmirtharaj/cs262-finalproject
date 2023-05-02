@@ -22,7 +22,7 @@ class Mapper():
 					bucket_id = ord(word[0]) % M
 					if filename not in self._files:
 						self.files[filename] = open(filename, 'a')
-					words = self.files(f'{map_dirs}/mr-{map_id}-{bucket_id}')
+					words = self.files(f'map_dirs/mr-{map_id}-{bucket_id}')
 					words.write(f'{word}\n')
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
