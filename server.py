@@ -29,41 +29,49 @@ class Server(pb2_grpc.MapReduceServicer):
         print(data_by_id)
         return data_by_id
     
-    def get_map_or_reduce_task(self):
+    def get_map_task(self):
         task_id = self.task_id
         self.task_id += 1
+        print(task_id)
 
-        if self.cur_task_type == pb2.TaskType.map:
-            num_tasks = self.num_map_tasks
-        else:
-            num_tasks = self.num_red_tasks
-
-        if task_id == num_tasks - 1:
+        if task_id == self.num_map_tasks - 1:
+            print("no more tasks")
             self.cur_task_type = pb2.TaskType.idle
-
-        if self.cur_task_type == pb2.TaskType.map:
-            return pb2.Task(task_type=pb2.TaskType.map,
+        
+        return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
                             data=self.split_data[task_id],
                             M=self.num_map_tasks
                             )
-        else:
-            return pb2.Task(task_type=pb2.TaskType.reduce,
+
+    def get_reduce_task(self):
+        task_id = self.task_id
+        self.task_id += 1
+        print(task_id)
+
+        if task_id == self.num_red_tasks - 1:
+            print("no more tasks")
+            self.cur_task_type = pb2.TaskType.idle
+
+        return pb2.Task(task_type=pb2.TaskType.reduce,
                             id=task_id,
                             )
     
     def get_worker_task(self, request: pb2.Empty, context):
         with self.lock:
-            if self.cur_task_type == pb2.TaskType.map or self.cur_task_type == pb2.TaskType.reduce:
-                return self.get_map_or_reduce_task()
+            if self.cur_task_type == pb2.TaskType.map:
+                return self.get_map_task()
+            elif self.cur_task_type == pb2.TaskType.reduce:
+                return self.get_reduce_task()
             return pb2.Task(task_type=self.cur_task_type)
     
     def finish_map_task(self, request: pb2.Empty, context):
+        print("finished")
         with self.lock:
             self.task_count += 1
             
             if self.task_count == self.num_map_tasks:
-                self.cur_task_type = pb2.TaskType.map
+                self.cur_task_type = pb2.TaskType.reduce
                 self.task_id = 0
                 self.task_count = 0
             
