@@ -52,7 +52,10 @@ class Reducer():
 		return counter
 
 	def reduce(self, bucket_id):
-		os.makedirs('out')
+		try:
+			os.makedirs('out')
+		except:
+			pass
 		counts = self.count_bucket(bucket_id)
 		with open(f'out/out-{bucket_id}', 'a') as out:
 			for key, val in counts.items():
