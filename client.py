@@ -16,6 +16,8 @@ class Client():
         self.state = "working"
 
     def _ask_task(self):
+        self.channel = grpc.insecure_channel(SERVER_ADDRESS)
+        self.stub = pb2_grpc.MapReduceStub(self.channel)
         task = self.stub.get_worker_task(pb2.Empty())
         return task
 

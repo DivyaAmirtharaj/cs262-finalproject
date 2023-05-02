@@ -62,7 +62,9 @@ class Reducer():
 		counts = self.count_bucket(bucket_id)
 		with open(f'out/out-{bucket_id}', 'a') as out:
 			for key, val in counts.items():
+				print("writing")
 				out.write(f'{key} {val}\n')
+			out.close()
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)

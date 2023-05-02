@@ -66,7 +66,7 @@ class Server(pb2_grpc.MapReduceServicer):
             return pb2.Task(task_type=self.cur_task_type)
     
     def finish_map_task(self, request: pb2.Empty, context):
-        print("finished")
+        print("finished map")
         with self.lock:
             self.task_count += 1
             
@@ -78,6 +78,7 @@ class Server(pb2_grpc.MapReduceServicer):
             return pb2.Empty()
 
     def finish_reduce_task(self, request: pb2.Empty, context):
+        print("finished reduce")
         with self.lock:
             self.task_count += 1
             
