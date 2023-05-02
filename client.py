@@ -33,7 +33,6 @@ class Client():
             except Exception as e:
                 print(e)
 
-
 if __name__ == '__main__':
     port = str(sys.argv[1])
     client = Client(port)
