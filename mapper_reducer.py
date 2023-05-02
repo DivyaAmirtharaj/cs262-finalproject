@@ -14,25 +14,28 @@ class Mapper():
 
 	# pass set of filenames 
 	def map(self, map_id, filenames, M): 
-		os.makedirs('map_dirs')
+		try:
+			os.makedirs('map_dirs')
+		except Exception as e:
+			pass
 		
 		for filename in filenames:
 			with open(filename, 'r') as file:
 				for word in file.read().split():
 					bucket_id = ord(word[0]) % M
-					if filename not in self._files:
+					if filename not in self.files:
 						self.files[filename] = open(filename, 'a')
-					words = self.files(f'map_dirs/mr-{map_id}-{bucket_id}')
+					words = self.files[f'map_dirs/mr-{map_id}-{bucket_id}']
 					words.write(f'{word}\n')
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
-			stub.finish_map_task(pb2_grpc.Empty())
+			stub.finish_map_task(pb2.Empty())
 
 class Reducer():
 	def __init__(self) -> None:
 		pass
-	
+
 	def count_bucket(self, bucket_id):
 		counter = {}
 		for file in glob.glob(f'map_dirs/mr-*-{bucket_id}'):
@@ -42,7 +45,6 @@ class Reducer():
 					if w not in counter:
 						counter[w] = 0
 					counter[w] += 1
-
 		return counter
 
 	def reduce(self, bucket_id):
@@ -54,4 +56,4 @@ class Reducer():
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
-			stub.finish_reduce_task(pb2_grpc.Empty())
+			stub.finish_reduce_task(pb2.Empty())
