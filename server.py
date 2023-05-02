@@ -41,13 +41,13 @@ class Server(pb2_grpc.MapReduceServicer):
             self.cur_task_type = pb2.TaskType.idle
 
         if self.cur_task_type == pb2.TaskType.map:
-            return pb2.Task(type=pb2.TaskType.map,
+            return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
                             data=self.split_data[task_id],
                             M=self.num_map_tasks
                             )
         else:
-            return pb2.Task(type=pb2.TaskType.map,
+            return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
                             )
     
