@@ -19,7 +19,6 @@ message Task {
     repeated string data = 4;
 }
 
-
 service MapReduce {
     rpc get_worker_task (Empty) returns (Task);
     rpc finish_map_task (Empty) returns (Task);

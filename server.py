@@ -1,7 +1,7 @@
 import protos.mapreduce_pb2_grpc as pb2_grpc
 import protos.mapreduce_pb2 as pb2
 from concurrent import futures
-from threading import Lock, Event
+from threading import Lock
 import grpc
 import time
 import argparse
@@ -18,7 +18,7 @@ class Server(pb2_grpc.MapReduceServicer):
         self.split_data = {}
     
     def chunk_data(self):
-        pass
+        
     
     def get_map_or_reduce_task(self):
         id = self.task_id
@@ -64,7 +64,6 @@ class Server(pb2_grpc.MapReduceServicer):
             
             if self.task_count == self.num_red_tasks:
                 self.cur_task_type = pb2.TaskType.shut_down
-                # stop
             
             return pb2.Empty()
 
