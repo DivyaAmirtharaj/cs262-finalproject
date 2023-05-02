@@ -33,6 +33,11 @@ class Mapper():
 
 					words = self.files[new_file]
 					words.write(f'{word}\n')
+
+		for file in self.files.values():
+			file.close()
+		self.files = {}
+
 		print("exited loop")
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
@@ -47,6 +52,7 @@ class Reducer():
 		counter = {}
 		for file in glob.glob(f'map_dirs/mr-*-{bucket_id}'):
 			with open(file) as f:
+				print(file)
 				for word in f.readlines():
 					w = word.strip()
 					if w not in counter:
@@ -61,6 +67,7 @@ class Reducer():
 			pass
 		counts = self.count_bucket(bucket_id)
 		with open(f'out/out-{bucket_id}', 'a') as out:
+			print(counts)
 			for key, val in counts.items():
 				print("writing")
 				out.write(f'{key} {val}\n')
