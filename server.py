@@ -26,6 +26,7 @@ class Server(pb2_grpc.MapReduceServicer):
         for i, filename in enumerate(data_filenames):
             id = i % num_map_tasks
             data_by_id[id].append(filename)
+        print(data_by_id)
         return data_by_id
     
     def get_map_or_reduce_task(self):
@@ -53,7 +54,9 @@ class Server(pb2_grpc.MapReduceServicer):
     
     def get_worker_task(self, request: pb2.Empty, context):
         with self.lock:
-            return self.get_map_or_reduce_task()
+            if self.cur_task_type == pb2.TaskType.map or self.cur_task_type == pb2.TaskType.reduce:
+                return self.get_map_or_reduce_task()
+            return pb2.Task(task_type=self.cur_task_type)
     
     def finish_map_task(self, request: pb2.Empty, context):
         with self.lock:

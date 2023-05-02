@@ -13,6 +13,7 @@ class Client():
         self.stub = pb2_grpc.MapReduceStub(self.channel)
         self.mapper = Mapper()
         self.reducer = Reducer()
+        self.state = "working"
 
     def _ask_task(self):
         task = self.stub.get_worker_task(pb2.Empty())
@@ -22,16 +23,23 @@ class Client():
         while True:
             try:
                 task = self._ask_task()
+                print(task.task_type)
                 if task.task_type == pb2.TaskType.map:
+                    self.state = "working"
                     self.mapper.map(task.id, task.data, task.M)
                 elif task.task_type == pb2.TaskType.reduce:
+                    self.state = "working"
                     self.reducer.reduce(task.id)
-                elif task.task_type == pb2.TaskType.shut_down:
-                    pass
+                elif task.task_type == pb2.TaskType.idle:
+                    self.state = "idle"
                 else:
+                    print("returned")
                     return
             except Exception as e:
-                print(e)
+                if self.state != "waiting":
+                    print("Server is unavailable")
+                    self.state = "waiting"
+
 
 if __name__ == '__main__':
     port = str(sys.argv[1])
