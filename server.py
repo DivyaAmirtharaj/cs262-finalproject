@@ -16,11 +16,16 @@ class Server(pb2_grpc.MapReduceServicer):
         self.task_id = 0
         self.cur_task_type = pb2.TaskType.map
         self.start_time = time.time()
-        self.split_data = {}
+        self.directory = "./inputs"
+        self.split_data = self.split_data_for_map(num_map_tasks)
     
-    def split_data_for_map(self):
-
-        
+    def split_data_for_map(self, num_map_tasks):
+        data_by_id = {}
+        data_filenames = glob.glob(f'{self.directory}/*')
+        for i, filename in enumerate(data_filenames):
+            id = i % num_map_tasks
+            data_by_id[id].append(filename)
+        return data_by_id
     
     def get_map_or_reduce_task(self):
         task_id = self.task_id
@@ -81,7 +86,7 @@ if __name__ == '__main__':
     address = "localhost"
     port = 50050
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # create a gRPC server
-    pb2_grpc.add_MapReduceServicer_to_server(Server(), server)  # register the server to gRPC
+    pb2_grpc.add_MapReduceServicer_to_server(Server(num_map_tasks, num_red_tasks), server)  # register the server to gRPC
     print(f'Server is listening on {port}!')
     server.add_insecure_port("{}:{}".format(address, port))
     server.start()
