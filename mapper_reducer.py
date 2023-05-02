@@ -22,6 +22,7 @@ class Mapper():
 		for filename in filenames:
 			with open(filename, 'r') as file:
 				text = file.read()
+				print(text)
 				for word in text.split():
 					bucket_id = ord(word[0]) % M
 
@@ -32,6 +33,7 @@ class Mapper():
 
 					words = self.files[new_file]
 					words.write(f'{word}\n')
+		print("exited loop")
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)

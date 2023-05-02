@@ -47,7 +47,7 @@ class Server(pb2_grpc.MapReduceServicer):
                             M=self.num_map_tasks
                             )
         else:
-            return pb2.Task(task_type=pb2.TaskType.map,
+            return pb2.Task(task_type=pb2.TaskType.reduce,
                             id=task_id,
                             )
     
