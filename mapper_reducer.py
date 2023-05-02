@@ -2,6 +2,8 @@ import grpc
 import protos.mapreduce_pb2_grpc as pb2_grpc
 import protos.mapreduce_pb2 as pb2
 
+from protos.mapreduce_pb2_grpc import MapReduceStub
+
 SERVER_ADDRESS = 'localhost:50050'
 
 class Mapper():
@@ -25,8 +27,8 @@ class Mapper():
 	                words.write(f'{word}\n')
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
-			stub = DriverServiceStub(channel)
-			stub.FinishMap(Empty())
+			stub = MapReduceStub(channel)
+			stub.finish_map_task(Empty())
 
 class Reducer():
 
@@ -52,5 +54,5 @@ class Reducer():
 				out.write(f'{key} {val}\n')
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
-            stub = DriverServiceStub(channel)
-            stub.FinishReduce(Empty())
+            stub = MapReduceStub(channel)
+            stub.finish_reduce_task(Empty())
