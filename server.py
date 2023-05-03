@@ -6,7 +6,12 @@ import grpc
 import time
 import argparse
 import glob
+import os
 from collections import defaultdict
+
+INPUT_DIR = "./books"
+INTERMEDIATE_DIR = "./map_dirs"
+OUT_DIR = "./out"
 
 class Server(pb2_grpc.MapReduceServicer):
     def __init__(self, num_map_tasks, num_red_asks):
@@ -17,12 +22,18 @@ class Server(pb2_grpc.MapReduceServicer):
         self.task_id = 0
         self.cur_task_type = pb2.TaskType.map
         self.start_time = time.time()
-        self.directory = "./inputs"
         self.split_data = self.split_data_for_map(num_map_tasks)
     
+    def clear_prev_output_data(self, dir):
+        filenames = glob.glob(f'{dir}/*')
+        for f in filenames:
+            os.remove(f)
+
     def split_data_for_map(self, num_map_tasks):
+        self.clear_prev_output_data(INTERMEDIATE_DIR)
+        self.clear_prev_output_data(OUT_DIR)
         data_by_id = defaultdict(list)
-        data_filenames = glob.glob(f'{self.directory}/*')
+        data_filenames = glob.glob(f'{INPUT_DIR}/*')
         for i, filename in enumerate(data_filenames):
             id = i % num_map_tasks
             data_by_id[id].append(filename)

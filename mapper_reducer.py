@@ -21,8 +21,8 @@ class Mapper():
 		
 		for filename in filenames:
 			with open(filename, 'r') as file:
+				print(f"Mapping {filename}")
 				text = file.read()
-				print(text)
 				for word in text.split():
 					bucket_id = ord(word[0]) % M
 
@@ -37,8 +37,6 @@ class Mapper():
 		for file in self.files.values():
 			file.close()
 		self.files = {}
-
-		print("exited loop")
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
@@ -67,9 +65,7 @@ class Reducer():
 			pass
 		counts = self.count_bucket(bucket_id)
 		with open(f'out/out-{bucket_id}', 'a') as out:
-			print(counts)
 			for key, val in counts.items():
-				print("writing")
 				out.write(f'{key} {val}\n')
 			out.close()
 
