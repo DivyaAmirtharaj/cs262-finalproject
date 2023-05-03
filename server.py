@@ -37,16 +37,13 @@ class Server(pb2_grpc.MapReduceServicer):
         for i, filename in enumerate(data_filenames):
             id = i % num_map_tasks
             data_by_id[id].append(filename)
-        print(data_by_id)
         return data_by_id
     
     def get_map_task(self):
         task_id = self.task_id
         self.task_id += 1
-        print(task_id)
 
         if task_id == self.num_map_tasks - 1:
-            print("no more tasks")
             self.cur_task_type = pb2.TaskType.idle
         
         return pb2.Task(task_type=pb2.TaskType.map,
@@ -58,10 +55,8 @@ class Server(pb2_grpc.MapReduceServicer):
     def get_reduce_task(self):
         task_id = self.task_id
         self.task_id += 1
-        print(task_id)
 
         if task_id == self.num_red_tasks - 1:
-            print("no more tasks")
             self.cur_task_type = pb2.TaskType.idle
 
         return pb2.Task(task_type=pb2.TaskType.reduce,
@@ -77,7 +72,6 @@ class Server(pb2_grpc.MapReduceServicer):
             return pb2.Task(task_type=self.cur_task_type)
     
     def finish_map_task(self, request: pb2.Empty, context):
-        print("finished map")
         with self.lock:
             self.task_count += 1
             
@@ -89,12 +83,13 @@ class Server(pb2_grpc.MapReduceServicer):
             return pb2.Empty()
 
     def finish_reduce_task(self, request: pb2.Empty, context):
-        print("finished reduce")
         with self.lock:
             self.task_count += 1
             
             if self.task_count == self.num_red_tasks:
                 self.cur_task_type = pb2.TaskType.shut_down
+                elapsed_time = time.time() - self.start_time
+                print(f"Finished after {elapsed_time} seconds")
             
             return pb2.Empty()
 

@@ -4,6 +4,7 @@ import protos.mapreduce_pb2 as pb2
 import os
 from protos.mapreduce_pb2_grpc import MapReduceStub
 import glob
+import string
 
 SERVER_ADDRESS = 'localhost:50050'
 
@@ -21,8 +22,8 @@ class Mapper():
 		
 		for filename in filenames:
 			with open(filename, 'r') as file:
-				print(f"Mapping {filename}")
 				text = file.read()
+				text = text.translate(str.maketrans('', '', string.punctuation)).lower()
 				for word in text.split():
 					bucket_id = ord(word[0]) % num_red_tasks
 
@@ -50,7 +51,6 @@ class Reducer():
 		counter = {}
 		for file in glob.glob(f'map_dirs/mr-*-{bucket_id}'):
 			with open(file) as f:
-				print(file)
 				for word in f.readlines():
 					w = word.strip()
 					if w not in counter:
