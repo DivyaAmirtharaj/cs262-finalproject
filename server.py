@@ -52,7 +52,7 @@ class Server(pb2_grpc.MapReduceServicer):
         return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
                             data=self.split_data[task_id],
-                            M=self.num_map_tasks
+                            M=self.num_red_tasks
                             )
 
     def get_reduce_task(self):

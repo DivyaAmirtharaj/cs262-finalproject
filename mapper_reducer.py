@@ -13,7 +13,7 @@ class Mapper():
 		self.files = {}
 
 	# pass set of filenames 
-	def map(self, map_id, filenames, M): 
+	def map(self, map_id, filenames, num_red_tasks): 
 		try:
 			os.makedirs('map_dirs')
 		except Exception as e:
@@ -24,7 +24,7 @@ class Mapper():
 				print(f"Mapping {filename}")
 				text = file.read()
 				for word in text.split():
-					bucket_id = ord(word[0]) % M
+					bucket_id = ord(word[0]) % num_red_tasks
 
 					new_file = f'map_dirs/mr-{map_id}-{bucket_id}'
 

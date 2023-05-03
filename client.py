@@ -27,6 +27,7 @@ class Client():
                 task = self._ask_task()
                 if task.task_type == pb2.TaskType.map:
                     self.state = "working"
+                    print(task.id)
                     self.mapper.map(task.id, task.data, task.M)
                 elif task.task_type == pb2.TaskType.reduce:
                     self.state = "working"

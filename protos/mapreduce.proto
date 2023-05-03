@@ -15,7 +15,7 @@ enum TaskType {
 message Task {
     TaskType task_type = 1;
     int64 id = 2;
-    int64 M = 3;
+    int64 num_red_tasks = 3;
     repeated string data = 4;
 }
 
