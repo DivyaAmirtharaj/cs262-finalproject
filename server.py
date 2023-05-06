@@ -14,7 +14,7 @@ INTERMEDIATE_DIR = "./map_dirs"
 OUT_DIR = "./out"
 
 class Server(pb2_grpc.MapReduceServicer):
-    def __init__(self, num_map_tasks, num_red_tasks, ports):
+    def __init__(self, num_map_tasks, num_red_tasks, workers):
         self.num_map_tasks = num_map_tasks
         self.num_red_tasks = num_red_tasks
         self.lock = Lock()
@@ -23,9 +23,9 @@ class Server(pb2_grpc.MapReduceServicer):
         self.cur_task_type = pb2.TaskType.map
         self.start_time = time.time()
         self.split_data = self.split_data_for_map(num_map_tasks)
-        self.worker_ids = ports
-        self.map_task_split = dict.fromkeys(ports, [])
-        self.red_task_split = dict.fromkeys(ports, [])
+        self.worker_ids = workers
+        self.map_task_split = {id : [] for id in workers}
+        self.red_task_split = {id : [] for id in workers}
         self.map_task_backlog = []
         self.red_task_backlog = []
     
@@ -66,7 +66,7 @@ class Server(pb2_grpc.MapReduceServicer):
             self.cur_task_type = pb2.TaskType.idle
         print(worker_id)
         print(task_id)
-        self.map_task_split[worker_id] = self.map_task_split[worker_id] + [task_id]
+        self.map_task_split[worker_id].append(task_id)
         print(self.map_task_split)
         
         return pb2.Task(task_type=pb2.TaskType.map,
