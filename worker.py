@@ -17,14 +17,14 @@ class Worker():
         self.state = "working"
 
     def _ask_task(self):
-        self.channel = grpc.insecure_channel(SERVER_ADDRESS)
-        self.stub = pb2_grpc.MapReduceStub(self.channel)
         task = self.stub.get_worker_task(pb2.Worker(id=self.id))
         return task
 
     def run(self):
         while True:
             try:
+                self.channel = grpc.insecure_channel(SERVER_ADDRESS)
+                self.stub = pb2_grpc.MapReduceStub(self.channel)
                 task = self._ask_task()
                 if task.task_type == pb2.TaskType.map:
                     print("mapping")
