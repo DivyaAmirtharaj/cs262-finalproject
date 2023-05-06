@@ -9,6 +9,7 @@ import glob
 import os
 from collections import defaultdict
 
+CHUNK_SIZE = 1000000  # Chunk size in bytes
 INPUT_DIR = "./books"
 INTERMEDIATE_DIR = "./map_dirs"
 OUT_DIR = "./out"
@@ -72,8 +73,12 @@ class Server(pb2_grpc.MapReduceServicer):
         data_by_id = defaultdict(list)
         data_filenames = glob.glob(f'{INPUT_DIR}/*')
         for i, filename in enumerate(data_filenames):
-            id = i % num_map_tasks
-            data_by_id[id].append(filename)
+            with open(filename, 'rb') as f:
+                chunk = f.read(CHUNK_SIZE)
+                while chunk:
+                    id = i % num_map_tasks
+                    data_by_id[id].append(chunk)
+                    chunk = f.read(CHUNK_SIZE)
         return data_by_id
 
     # returns the next map task given a certain worker id
@@ -95,11 +100,11 @@ class Server(pb2_grpc.MapReduceServicer):
         if task_id == self.num_map_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
         
-        print(worker_id)
-        print(task_id)
+        #print(worker_id)
+        #print(task_id)
         # records that this task was done by the given worker
         self.map_task_split[worker_id].append(task_id)
-        print(self.map_task_split)
+        #print(self.map_task_split)
         
         return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,

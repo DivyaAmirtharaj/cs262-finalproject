@@ -14,26 +14,24 @@ class Mapper():
 		self.files = {}
 
 	# pass set of filenames 
-	def map(self, map_id, filenames, num_red_tasks): 
+	def map(self, map_id, chunks, num_red_tasks): 
 		try:
 			os.makedirs('map_dirs')
 		except Exception as e:
 			pass
 		
-		for filename in filenames:
-			with open(filename, 'r') as file:
-				text = file.read()
-				text = text.translate(str.maketrans('', '', string.punctuation)).lower()
-				for word in text.split():
-					bucket_id = ord(word[0]) % num_red_tasks
+		for chunk in chunks:
+			text = chunk.translate(str.maketrans('', '', string.punctuation)).lower()
 
-					new_file = f'map_dirs/mr-{map_id}-{bucket_id}'
+			for word in text.split():
+				bucket_id = ord(word[0]) % num_red_tasks
+				new_file = f'map_dirs/mr-{map_id}-{bucket_id}'
 
-					if new_file not in self.files:
-						self.files[new_file] = open(new_file, 'a')
+				if new_file not in self.files:
+					self.files[new_file] = open(new_file, 'a')
 
-					words = self.files[new_file]
-					words.write(f'{word}\n')
+				words = self.files[new_file]
+				words.write(f'{word}\n')
 
 		for file in self.files.values():
 			file.close()
