@@ -148,6 +148,7 @@ class Server(pb2_grpc.MapReduceServicer):
     def get_worker_task(self, request: pb2.Worker, context):
         with self.lock:
             worker_id = request.id
+            print(worker_id)
             if self.cur_task_type == pb2.TaskType.map:
                 return self.get_map_task(worker_id)
             elif self.cur_task_type == pb2.TaskType.reduce:
