@@ -6,7 +6,7 @@ message Empty {
 }
 
 message Worker {
-    int64 port = 1;
+    int64 id = 1;
 }
 
 enum TaskType {

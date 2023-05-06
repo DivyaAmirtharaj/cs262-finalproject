@@ -41,6 +41,7 @@ class Mapper():
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
+			print("finishing")
 			stub.finish_map_task(pb2.Empty())
 
 class Reducer():

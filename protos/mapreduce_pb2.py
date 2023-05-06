@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16protos/mapreduce.proto\x12\x04grpc\"\x07\n\x05\x45mpty\"\x16\n\x06Worker\x12\x0c\n\x04port\x18\x01 \x01(\x03\"Z\n\x04Task\x12!\n\ttask_type\x18\x01 \x01(\x0e\x32\x0e.grpc.TaskType\x12\n\n\x02id\x18\x02 \x01(\x03\x12\x15\n\rnum_red_tasks\x18\x03 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x04 \x03(\t*8\n\x08TaskType\x12\x08\n\x04idle\x10\x00\x12\x07\n\x03map\x10\x01\x12\n\n\x06reduce\x10\x02\x12\r\n\tshut_down\x10\x03\x32\xbd\x01\n\tMapReduce\x12+\n\x0fget_worker_task\x12\x0c.grpc.Worker\x1a\n.grpc.Task\x12*\n\x0f\x66inish_map_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12-\n\x12\x66inish_reduce_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12(\n\x0bworker_down\x12\x0c.grpc.Worker\x1a\x0b.grpc.Emptyb\x06proto3'
+  serialized_pb=b'\n\x16protos/mapreduce.proto\x12\x04grpc\"\x07\n\x05\x45mpty\"\x14\n\x06Worker\x12\n\n\x02id\x18\x01 \x01(\x03\"Z\n\x04Task\x12!\n\ttask_type\x18\x01 \x01(\x0e\x32\x0e.grpc.TaskType\x12\n\n\x02id\x18\x02 \x01(\x03\x12\x15\n\rnum_red_tasks\x18\x03 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x04 \x03(\t*8\n\x08TaskType\x12\x08\n\x04idle\x10\x00\x12\x07\n\x03map\x10\x01\x12\n\n\x06reduce\x10\x02\x12\r\n\tshut_down\x10\x03\x32\xbd\x01\n\tMapReduce\x12+\n\x0fget_worker_task\x12\x0c.grpc.Worker\x1a\n.grpc.Task\x12*\n\x0f\x66inish_map_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12-\n\x12\x66inish_reduce_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12(\n\x0bworker_down\x12\x0c.grpc.Worker\x1a\x0b.grpc.Emptyb\x06proto3'
 )
 
 _TASKTYPE = _descriptor.EnumDescriptor(
@@ -53,8 +53,8 @@ _TASKTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=157,
-  serialized_end=213,
+  serialized_start=155,
+  serialized_end=211,
 )
 _sym_db.RegisterEnumDescriptor(_TASKTYPE)
 
@@ -100,7 +100,7 @@ _WORKER = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='port', full_name='grpc.Worker.port', index=0,
+      name='id', full_name='grpc.Worker.id', index=0,
       number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -119,7 +119,7 @@ _WORKER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=41,
-  serialized_end=63,
+  serialized_end=61,
 )
 
 
@@ -171,8 +171,8 @@ _TASK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=65,
-  serialized_end=155,
+  serialized_start=63,
+  serialized_end=153,
 )
 
 _TASK.fields_by_name['task_type'].enum_type = _TASKTYPE
@@ -212,8 +212,8 @@ _MAPREDUCE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=216,
-  serialized_end=405,
+  serialized_start=214,
+  serialized_end=403,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_worker_task',
