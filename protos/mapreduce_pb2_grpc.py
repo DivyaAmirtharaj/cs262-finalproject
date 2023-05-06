@@ -16,7 +16,7 @@ class MapReduceStub(object):
         """
         self.get_worker_task = channel.unary_unary(
                 '/grpc.MapReduce/get_worker_task',
-                request_serializer=protos_dot_mapreduce__pb2.Empty.SerializeToString,
+                request_serializer=protos_dot_mapreduce__pb2.Worker.SerializeToString,
                 response_deserializer=protos_dot_mapreduce__pb2.Task.FromString,
                 )
         self.finish_map_task = channel.unary_unary(
@@ -28,6 +28,11 @@ class MapReduceStub(object):
                 '/grpc.MapReduce/finish_reduce_task',
                 request_serializer=protos_dot_mapreduce__pb2.Empty.SerializeToString,
                 response_deserializer=protos_dot_mapreduce__pb2.Task.FromString,
+                )
+        self.worker_down = channel.unary_unary(
+                '/grpc.MapReduce/worker_down',
+                request_serializer=protos_dot_mapreduce__pb2.Worker.SerializeToString,
+                response_deserializer=protos_dot_mapreduce__pb2.Empty.FromString,
                 )
 
 
@@ -52,12 +57,18 @@ class MapReduceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def worker_down(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_MapReduceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'get_worker_task': grpc.unary_unary_rpc_method_handler(
                     servicer.get_worker_task,
-                    request_deserializer=protos_dot_mapreduce__pb2.Empty.FromString,
+                    request_deserializer=protos_dot_mapreduce__pb2.Worker.FromString,
                     response_serializer=protos_dot_mapreduce__pb2.Task.SerializeToString,
             ),
             'finish_map_task': grpc.unary_unary_rpc_method_handler(
@@ -69,6 +80,11 @@ def add_MapReduceServicer_to_server(servicer, server):
                     servicer.finish_reduce_task,
                     request_deserializer=protos_dot_mapreduce__pb2.Empty.FromString,
                     response_serializer=protos_dot_mapreduce__pb2.Task.SerializeToString,
+            ),
+            'worker_down': grpc.unary_unary_rpc_method_handler(
+                    servicer.worker_down,
+                    request_deserializer=protos_dot_mapreduce__pb2.Worker.FromString,
+                    response_serializer=protos_dot_mapreduce__pb2.Empty.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -92,7 +108,7 @@ class MapReduce(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc.MapReduce/get_worker_task',
-            protos_dot_mapreduce__pb2.Empty.SerializeToString,
+            protos_dot_mapreduce__pb2.Worker.SerializeToString,
             protos_dot_mapreduce__pb2.Task.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
@@ -128,5 +144,22 @@ class MapReduce(object):
         return grpc.experimental.unary_unary(request, target, '/grpc.MapReduce/finish_reduce_task',
             protos_dot_mapreduce__pb2.Empty.SerializeToString,
             protos_dot_mapreduce__pb2.Task.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def worker_down(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/grpc.MapReduce/worker_down',
+            protos_dot_mapreduce__pb2.Worker.SerializeToString,
+            protos_dot_mapreduce__pb2.Empty.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

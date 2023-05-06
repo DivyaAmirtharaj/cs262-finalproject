@@ -5,6 +5,10 @@ package grpc;
 message Empty {
 }
 
+message Worker {
+    int64 port = 1;
+}
+
 enum TaskType {
     idle = 0;
     map = 1;
@@ -20,7 +24,8 @@ message Task {
 }
 
 service MapReduce {
-    rpc get_worker_task (Empty) returns (Task);
+    rpc get_worker_task (Worker) returns (Task);
     rpc finish_map_task (Empty) returns (Task);
     rpc finish_reduce_task (Empty) returns (Task);
+    rpc worker_down(Worker) returns (Empty);
 } 

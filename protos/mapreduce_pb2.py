@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16protos/mapreduce.proto\x12\x04grpc\"\x07\n\x05\x45mpty\"N\n\x04Task\x12!\n\ttask_type\x18\x01 \x01(\x0e\x32\x0e.grpc.TaskType\x12\n\n\x02id\x18\x02 \x01(\x03\x12\t\n\x01M\x18\x03 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x04 \x03(\t*8\n\x08TaskType\x12\x08\n\x04idle\x10\x00\x12\x07\n\x03map\x10\x01\x12\n\n\x06reduce\x10\x02\x12\r\n\tshut_down\x10\x03\x32\x92\x01\n\tMapReduce\x12*\n\x0fget_worker_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12*\n\x0f\x66inish_map_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12-\n\x12\x66inish_reduce_task\x12\x0b.grpc.Empty\x1a\n.grpc.Taskb\x06proto3'
+  serialized_pb=b'\n\x16protos/mapreduce.proto\x12\x04grpc\"\x07\n\x05\x45mpty\"\x16\n\x06Worker\x12\x0c\n\x04port\x18\x01 \x01(\x03\"Z\n\x04Task\x12!\n\ttask_type\x18\x01 \x01(\x0e\x32\x0e.grpc.TaskType\x12\n\n\x02id\x18\x02 \x01(\x03\x12\x15\n\rnum_red_tasks\x18\x03 \x01(\x03\x12\x0c\n\x04\x64\x61ta\x18\x04 \x03(\t*8\n\x08TaskType\x12\x08\n\x04idle\x10\x00\x12\x07\n\x03map\x10\x01\x12\n\n\x06reduce\x10\x02\x12\r\n\tshut_down\x10\x03\x32\xbd\x01\n\tMapReduce\x12+\n\x0fget_worker_task\x12\x0c.grpc.Worker\x1a\n.grpc.Task\x12*\n\x0f\x66inish_map_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12-\n\x12\x66inish_reduce_task\x12\x0b.grpc.Empty\x1a\n.grpc.Task\x12(\n\x0bworker_down\x12\x0c.grpc.Worker\x1a\x0b.grpc.Emptyb\x06proto3'
 )
 
 _TASKTYPE = _descriptor.EnumDescriptor(
@@ -53,8 +53,8 @@ _TASKTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=121,
-  serialized_end=177,
+  serialized_start=157,
+  serialized_end=213,
 )
 _sym_db.RegisterEnumDescriptor(_TASKTYPE)
 
@@ -91,6 +91,38 @@ _EMPTY = _descriptor.Descriptor(
 )
 
 
+_WORKER = _descriptor.Descriptor(
+  name='Worker',
+  full_name='grpc.Worker',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='port', full_name='grpc.Worker.port', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=41,
+  serialized_end=63,
+)
+
+
 _TASK = _descriptor.Descriptor(
   name='Task',
   full_name='grpc.Task',
@@ -114,7 +146,7 @@ _TASK = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='M', full_name='grpc.Task.M', index=2,
+      name='num_red_tasks', full_name='grpc.Task.num_red_tasks', index=2,
       number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -139,12 +171,13 @@ _TASK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=41,
-  serialized_end=119,
+  serialized_start=65,
+  serialized_end=155,
 )
 
 _TASK.fields_by_name['task_type'].enum_type = _TASKTYPE
 DESCRIPTOR.message_types_by_name['Empty'] = _EMPTY
+DESCRIPTOR.message_types_by_name['Worker'] = _WORKER
 DESCRIPTOR.message_types_by_name['Task'] = _TASK
 DESCRIPTOR.enum_types_by_name['TaskType'] = _TASKTYPE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -155,6 +188,13 @@ Empty = _reflection.GeneratedProtocolMessageType('Empty', (_message.Message,), {
   # @@protoc_insertion_point(class_scope:grpc.Empty)
   })
 _sym_db.RegisterMessage(Empty)
+
+Worker = _reflection.GeneratedProtocolMessageType('Worker', (_message.Message,), {
+  'DESCRIPTOR' : _WORKER,
+  '__module__' : 'protos.mapreduce_pb2'
+  # @@protoc_insertion_point(class_scope:grpc.Worker)
+  })
+_sym_db.RegisterMessage(Worker)
 
 Task = _reflection.GeneratedProtocolMessageType('Task', (_message.Message,), {
   'DESCRIPTOR' : _TASK,
@@ -172,15 +212,15 @@ _MAPREDUCE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=180,
-  serialized_end=326,
+  serialized_start=216,
+  serialized_end=405,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_worker_task',
     full_name='grpc.MapReduce.get_worker_task',
     index=0,
     containing_service=None,
-    input_type=_EMPTY,
+    input_type=_WORKER,
     output_type=_TASK,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
@@ -202,6 +242,16 @@ _MAPREDUCE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_EMPTY,
     output_type=_TASK,
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='worker_down',
+    full_name='grpc.MapReduce.worker_down',
+    index=3,
+    containing_service=None,
+    input_type=_WORKER,
+    output_type=_EMPTY,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

@@ -14,7 +14,7 @@ INTERMEDIATE_DIR = "./map_dirs"
 OUT_DIR = "./out"
 
 class Server(pb2_grpc.MapReduceServicer):
-    def __init__(self, num_map_tasks, num_red_asks):
+    def __init__(self, num_map_tasks, num_red_tasks, ports):
         self.num_map_tasks = num_map_tasks
         self.num_red_tasks = num_red_tasks
         self.lock = Lock()
@@ -23,11 +23,21 @@ class Server(pb2_grpc.MapReduceServicer):
         self.cur_task_type = pb2.TaskType.map
         self.start_time = time.time()
         self.split_data = self.split_data_for_map(num_map_tasks)
+        self.worker_ports = ports
+        self.map_task_split = dict.fromkeys(ports, [])
+        self.red_task_split = dict.fromkeys(ports, [])
+        self.map_task_backlog = []
+        self.red_task_backlog = []
     
     def clear_prev_output_data(self, dir):
         filenames = glob.glob(f'{dir}/*')
         for f in filenames:
             os.remove(f)
+    
+    def update_task_backlogs(self, id):
+        self.map_task_backlog.extend(self.map_task_split[id])
+        self.red_task_backlog.extend(self.red_task_split[id])
+        self.task_count -= (len(self.map_task_split[id]) + len(self.red_task_split[id]))
 
     def split_data_for_map(self, num_map_tasks):
         self.clear_prev_output_data(INTERMEDIATE_DIR)
@@ -38,13 +48,18 @@ class Server(pb2_grpc.MapReduceServicer):
             id = i % num_map_tasks
             data_by_id[id].append(filename)
         return data_by_id
-    
-    def get_map_task(self):
-        task_id = self.task_id
-        self.task_id += 1
+
+    def get_map_task(self, worker_port):
+        if len(self.map_task_backlog) != 0:
+            task_id = self.map_task_backlog.pop(0)
+        else:
+            task_id = self.task_id
+            self.task_id += 1
 
         if task_id == self.num_map_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
+        
+        self.map_task_split[worker_port].append(task_id)
         
         return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
@@ -52,23 +67,37 @@ class Server(pb2_grpc.MapReduceServicer):
                             M=self.num_red_tasks
                             )
 
-    def get_reduce_task(self):
+    def get_reduce_task(self, worker_port):
+        if len(self.red_task_backlog) != 0:
+            task_id = self.red_task_backlog.pop(0)
+        else:
+            task_id = self.task_id
+            self.task_id += 1
+        
         task_id = self.task_id
         self.task_id += 1
 
         if task_id == self.num_red_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
 
+        self.red_task_split[worker_port].append(task_id)
+
         return pb2.Task(task_type=pb2.TaskType.reduce,
                             id=task_id,
                             )
     
-    def get_worker_task(self, request: pb2.Empty, context):
+    def worker_down(self, request: pb2.Worker):
+        down_id = request.id
+        self.update_task_backlogs()
+        return pb2.Empty()
+
+    def get_worker_task(self, request: pb2.Worker, context):
         with self.lock:
+            worker_port = request.port
             if self.cur_task_type == pb2.TaskType.map:
-                return self.get_map_task()
+                return self.get_map_task(worker_port)
             elif self.cur_task_type == pb2.TaskType.reduce:
-                return self.get_reduce_task()
+                return self.get_reduce_task(worker_port)
             return pb2.Task(task_type=self.cur_task_type)
     
     def finish_map_task(self, request: pb2.Empty, context):
@@ -96,18 +125,22 @@ class Server(pb2_grpc.MapReduceServicer):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-M', dest='M', type=int, required=True, help='number of map tasks')
-    parser.add_argument('-N', dest='N', type=int, required=True, help='number of reduce tasks')
+    parser.add_argument('-N', dest='N', type=int,required=True, help='number of reduce tasks')
+    parser.add_argument('-workers', dest='worker_list', nargs="*", type=str, default=[50051, 50052])
     args = parser.parse_args()
 
     num_map_tasks = args.M
     num_red_tasks = args.N
+    workers = args.worker_list
 
     address = "localhost"
     port = 50050
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # create a gRPC server
-    pb2_grpc.add_MapReduceServicer_to_server(Server(num_map_tasks, num_red_tasks), server)  # register the server to gRPC
+    mapreduce = Server(num_map_tasks, num_red_tasks, workers)
+    pb2_grpc.add_MapReduceServicer_to_server(mapreduce, server)  # register the server to gRPC
     print(f'Server is listening on {port}!')
     server.add_insecure_port("{}:{}".format(address, port))
     server.start()
+
     while True:
-        time.sleep(64 * 64 * 100)
+            time.sleep(64 * 64 * 100)
