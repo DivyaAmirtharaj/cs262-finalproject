@@ -9,7 +9,6 @@ import glob
 import os
 from collections import defaultdict
 
-CHUNK_SIZE = 1000000  # Chunk size in bytes
 INPUT_DIR = "./books"
 INTERMEDIATE_DIR = "./map_dirs"
 OUT_DIR = "./out"
@@ -22,8 +21,9 @@ workers, keeps track of which tasks have been assigned and done, and assigns and
 reassigns tasks to workers that make requests to it
 """
 class Server(pb2_grpc.MapReduceServicer):
-    def __init__(self, num_map_tasks, num_red_tasks, workers):
+    def __init__(self, num_map_tasks, num_red_tasks, chunk_size, workers):
         # number of map and reduce tasks given as params
+        self.chunk_size = chunk_size
         self.num_map_tasks = num_map_tasks
         self.num_red_tasks = num_red_tasks
         self.lock = Lock()
@@ -75,11 +75,11 @@ class Server(pb2_grpc.MapReduceServicer):
         data_filenames = glob.glob(f'{INPUT_DIR}/*')
         for i, filename in enumerate(data_filenames):
             with open(filename, 'rb') as f:
-                chunk = f.read(CHUNK_SIZE)
+                chunk = f.read(self.chunk_size)
                 while chunk:
                     id = i % num_map_tasks
                     data_by_id[id].append(chunk)
-                    chunk = f.read(CHUNK_SIZE)
+                    chunk = f.read(self.chunk_size)
         return data_by_id
 
     # returns the next map task given a certain worker id
@@ -189,7 +189,7 @@ class Server(pb2_grpc.MapReduceServicer):
                 print(f"Finished after {elapsed_time} seconds")
 
             with open(EXPERIMENT_FILE, 'a') as file:
-                file.write(f'Map tasks: {num_map_tasks}, Reduce tasks: {num_red_tasks}, Workers: {len(self.worker_ids)}, Time: {elapsed_time}\n')
+                file.write(f'Map tasks: {num_map_tasks}, Reduce tasks: {num_red_tasks}, Chunk Size: {self.chunk_size}, Workers: {len(self.worker_ids)}, Time: {elapsed_time}\n')
             return pb2.Empty()
 
 if __name__ == '__main__':
@@ -199,18 +199,20 @@ if __name__ == '__main__':
     # and a list of workers
     parser.add_argument('-M', dest='M', type=int, required=True, help='number of map tasks')
     parser.add_argument('-N', dest='N', type=int,required=True, help='number of reduce tasks')
+    parser.add_argument('-chunk', dest='chunk', type=int,required=True, help='size of chunks')
     parser.add_argument('-workers', dest='worker_list', nargs="*", type=int, default=[1,2])
     args = parser.parse_args()
 
     num_map_tasks = args.M
     num_red_tasks = args.N
+    chunk_size = args.chunk
     workers = args.worker_list
 
     # starts the server and adds the MapReducer
     address = "localhost"
     port = 50050
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # create a gRPC server
-    mapreduce = Server(num_map_tasks, num_red_tasks, workers)
+    mapreduce = Server(num_map_tasks, num_red_tasks, chunk_size, workers)
     pb2_grpc.add_MapReduceServicer_to_server(mapreduce, server)  # register the server to gRPC
     print(f'Server is listening on {port}!')
     server.add_insecure_port("{}:{}".format(address, port))

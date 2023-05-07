@@ -2,3 +2,9 @@ Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.5823099613189697
 Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.8810441493988037
 Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.7378871440887451
 Map tasks: 3, Reduce tasks: 2, Workers: 2, Time: 0.6060779094696045
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 0.7452716827392578
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 0.33243799209594727
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 0.7308211326599121
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 1.2149558067321777
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 0.5809841156005859
+Map tasks: 3, Reduce tasks: 2, Chunk Size: 100000, Workers: 2, Time: 0.3176310062408447
