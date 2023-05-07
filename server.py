@@ -13,6 +13,7 @@ CHUNK_SIZE = 1000000  # Chunk size in bytes
 INPUT_DIR = "./books"
 INTERMEDIATE_DIR = "./map_dirs"
 OUT_DIR = "./out"
+EXPERIMENT_FILE = "experiment_results.txt"
 
 """
 Server/Coordinator class for MapReduce framework for performing distributed word
@@ -186,7 +187,9 @@ class Server(pb2_grpc.MapReduceServicer):
                 self.cur_task_type = pb2.TaskType.shut_down
                 elapsed_time = time.time() - self.start_time
                 print(f"Finished after {elapsed_time} seconds")
-            
+
+            with open(EXPERIMENT_FILE, 'a') as file:
+                file.write(f'Map tasks: {num_map_tasks}, Reduce tasks: {num_red_tasks}, Workers: {len(self.worker_ids)}, Time: {elapsed_time}\n')
             return pb2.Empty()
 
 if __name__ == '__main__':

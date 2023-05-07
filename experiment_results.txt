@@ -1,0 +1,4 @@
+Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.5823099613189697
+Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.8810441493988037
+Map tasks: 2, Reduce tasks: 2, Workers: 2, Time: 0.7378871440887451
+Map tasks: 3, Reduce tasks: 2, Workers: 2, Time: 0.6060779094696045
