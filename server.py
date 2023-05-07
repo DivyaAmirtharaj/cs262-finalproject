@@ -188,8 +188,8 @@ class Server(pb2_grpc.MapReduceServicer):
                 elapsed_time = time.time() - self.start_time
                 print(f"Finished after {elapsed_time} seconds")
 
-            with open(EXPERIMENT_FILE, 'a') as file:
-                file.write(f'Map tasks: {num_map_tasks}, Reduce tasks: {num_red_tasks}, Chunk Size: {self.chunk_size}, Workers: {len(self.worker_ids)}, Time: {elapsed_time}\n')
+                with open(EXPERIMENT_FILE, 'a') as file:
+                    file.write(f'Map tasks: {num_map_tasks}, Reduce tasks: {num_red_tasks}, Chunk Size: {self.chunk_size}, Workers: {len(self.worker_ids)}, Time: {elapsed_time}\n')
             return pb2.Empty()
 
 if __name__ == '__main__':
