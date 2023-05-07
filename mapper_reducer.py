@@ -15,11 +15,6 @@ class Mapper():
 
 	# pass set of filenames 
 	def map(self, map_id, chunks, num_red_tasks): 
-		try:
-			os.makedirs('map_dirs')
-		except Exception as e:
-			pass
-		
 		map_results = {}
 		for chunk in chunks:
 			text = chunk.translate(str.maketrans('', '', string.punctuation)).lower()
@@ -31,7 +26,6 @@ class Mapper():
 					map_results[new_key] = []
 				
 				map_results[new_key].append(word)
-		#print(map_results)
 
 		res = pb2.MapResults()
 		for key, value in map_results.items():
@@ -53,15 +47,14 @@ class Reducer():
 		counter = {}
 		for container in map_results.map_results.values():
 			for word in container.word_list:
+				word = word.strip()
 				if word not in counter:
 					counter[word] = 0
 				counter[word] += 1
-		#print(counter)
 		return counter
 
 	def reduce(self, bucket_id, map_results):
 		counts = self.count_bucket(map_results)
-		
 		reduce_res = pb2.ReduceResults()
 		for key, val in counts.items():
 			reduce_res.reduce_results[key] = val

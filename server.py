@@ -100,11 +100,8 @@ class Server(pb2_grpc.MapReduceServicer):
         if task_id == self.num_map_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
         
-        #print(worker_id)
-        #print(task_id)
         # records that this task was done by the given worker
         self.map_task_split[worker_id].append(task_id)
-        #print(self.map_task_split)
         
         return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,
@@ -124,7 +121,6 @@ class Server(pb2_grpc.MapReduceServicer):
             task_id = self.task_id
             self.task_id += 1
     
-        print(task_id)
         if task_id == self.num_red_tasks - 1:
             self.cur_task_type = pb2.TaskType.idle
 
@@ -148,7 +144,6 @@ class Server(pb2_grpc.MapReduceServicer):
     def get_worker_task(self, request: pb2.Worker, context):
         with self.lock:
             worker_id = request.id
-            print(worker_id)
             if self.cur_task_type == pb2.TaskType.map:
                 return self.get_map_task(worker_id)
             elif self.cur_task_type == pb2.TaskType.reduce:
@@ -176,8 +171,6 @@ class Server(pb2_grpc.MapReduceServicer):
         with self.lock:
             reduce_results = request.reduce_results
             bucket_id = request.bucket_id
-            #print(reduce_results)
-            #print(bucket_id)
             try:
                 os.makedirs('server_out')
             except:
