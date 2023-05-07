@@ -20,7 +20,9 @@ for worker_id in range(num_workers):
 time.sleep(5)
 # Open a new terminal for the server
 terminal_process = subprocess.Popen(['osascript', '-e', 'tell app "Terminal" to do script "cd ' + directory + '; ' + server_command + '"'])
-time.sleep(2)
-terminal_process.terminate()
-subprocess.run(['osascript', '-e', 'tell application "Terminal" to close (every window whose name contains "' + directory + '")'])
+time.sleep(5)
 
+# Get the process ID (PID) of the terminal process
+terminal_pid = terminal_process.pid
+# Use sudo and kill to terminate the terminal process
+subprocess.run(['sudo', 'kill', '-9', str(terminal_pid)])
