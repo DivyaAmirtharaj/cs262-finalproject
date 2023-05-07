@@ -214,7 +214,7 @@ if __name__ == '__main__':
     workers = args.worker_list
 
     # starts the server and adds the MapReducer
-    address = "localhost"
+    address = "0.0.0.0"
     port = 50050
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # create a gRPC server
     mapreduce = Server(num_map_tasks, num_red_tasks, chunk_size, workers)

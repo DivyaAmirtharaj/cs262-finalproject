@@ -6,7 +6,6 @@ from protos.mapreduce_pb2_grpc import MapReduceStub
 import glob
 import string
 
-SERVER_ADDRESS = 'localhost:50050'
 
 class Mapper():
 	#need to add the enter/exit stuff for the file cache
@@ -14,7 +13,7 @@ class Mapper():
 		self.files = {}
 
 	# pass set of filenames 
-	def map(self, map_id, chunks, num_red_tasks): 
+	def map(self, map_id, chunks, num_red_tasks, server_address): 
 		map_results = {}
 		for chunk in chunks:
 			text = chunk.translate(str.maketrans('', '', string.punctuation)).lower()
@@ -33,7 +32,7 @@ class Mapper():
 			w.word_list.extend(value)
 			res.map_results[key].CopyFrom(w)
 
-		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
+		with grpc.insecure_channel(server_address) as channel:
 			stub = MapReduceStub(channel)
 			print("finishing")
 			stub.finish_map_task(res)
@@ -53,7 +52,7 @@ class Reducer():
 				counter[word] += 1
 		return counter
 
-	def reduce(self, bucket_id, map_results):
+	def reduce(self, bucket_id, map_results, server_address):
 		print(key for key in map_results.map_results.keys())
 		counts = self.count_bucket(map_results)
 		reduce_res = pb2.ReduceResults()
@@ -61,6 +60,6 @@ class Reducer():
 			reduce_res.reduce_results[key] = val
 		reduce_res.bucket_id = bucket_id
 
-		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
+		with grpc.insecure_channel(server_address) as channel:
 			stub = MapReduceStub(channel)
 			stub.finish_reduce_task(reduce_res)

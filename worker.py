@@ -5,12 +5,14 @@ from mapper_reducer import Mapper, Reducer
 from concurrent import futures
 import sys
 
-SERVER_ADDRESS = 'localhost:50050'
+SERVER_ADDRESS = '0.0.0.0:50050'
+SERVER_PORT = '50050'
 
 class Worker():
-    def __init__(self, id) -> None:
+    def __init__(self, id, address) -> None:
         self.id = id
-        self.channel = grpc.insecure_channel(SERVER_ADDRESS)
+        self.server_address = f"{address}:{SERVER_PORT}"
+        self.channel = grpc.insecure_channel(self.server_address)
         self.stub = pb2_grpc.MapReduceStub(self.channel)
         self.mapper = Mapper()
         self.reducer = Reducer()
@@ -25,17 +27,17 @@ class Worker():
     def run(self):
         while True:
             try:
-                self.channel = grpc.insecure_channel(SERVER_ADDRESS)
+                self.channel = grpc.insecure_channel(self.server_address)
                 self.stub = pb2_grpc.MapReduceStub(self.channel)
                 task = self._ask_task()
                 if task.task_type == pb2.TaskType.map:
                     print("mapping")
                     self.state = "working"
-                    res = self.mapper.map(task.id, task.data, task.num_red_tasks)
+                    res = self.mapper.map(task.id, task.data, task.num_red_tasks, self.server_address)
                     self.map_results = self.stub.finish_map_task(res)
                 elif task.task_type == pb2.TaskType.reduce:
                     self.state = "working"
-                    self.reducer.reduce(task.id, self.map_results)
+                    self.reducer.reduce(task.id, self.map_results, self.server_address)
                 elif task.task_type == pb2.TaskType.idle:
                     self.state = "idle"
                 else:
@@ -52,7 +54,7 @@ class Worker():
 
 
 if __name__ == '__main__':
-    address = "localhost"
     id = int(sys.argv[1])
-    worker = Worker(id)
+    address = sys.argv[2]
+    worker = Worker(id, address)
     worker.run()
