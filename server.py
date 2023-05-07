@@ -156,8 +156,9 @@ class Server(pb2_grpc.MapReduceServicer):
     
     # receives a request sent by a worker that indicates that
     # the most recentmap task has been finished
-    def finish_map_task(self, request: pb2.Empty, context):
+    def finish_map_task(self, request: pb2.MapResults, context):
         with self.lock:
+            map_results = request.map_results
             self.task_count += 1
             
             if self.task_count == self.num_map_tasks:
@@ -166,12 +167,25 @@ class Server(pb2_grpc.MapReduceServicer):
                 self.task_id = 0
                 self.task_count = 0
             
-            return pb2.Empty()
+            return pb2.MapResults(map_results=map_results)
 
     # receives a request sent by a worker that indicates that
     # the most recent reduce task has been finished
-    def finish_reduce_task(self, request: pb2.Empty, context):
+    def finish_reduce_task(self, request: pb2.ReduceResults, context):
         with self.lock:
+            reduce_results = request.reduce_results
+            bucket_id = request.bucket_id
+            #print(reduce_results)
+            #print(bucket_id)
+            try:
+                os.makedirs('server_out')
+            except:
+                pass
+            with open(f'server_out/out-{bucket_id}', 'a') as out:
+                for key, val in reduce_results.items():
+                    out.write(f'{key} {val}\n')
+                out.close()
+
             self.task_count += 1
             
             if self.task_count == self.num_red_tasks:

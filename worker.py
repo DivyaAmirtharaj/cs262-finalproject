@@ -15,6 +15,8 @@ class Worker():
         self.mapper = Mapper()
         self.reducer = Reducer()
         self.state = "working"
+        self.map_results = None
+        self.reduce_results = None
 
     def _ask_task(self):
         task = self.stub.get_worker_task(pb2.Worker(id=self.id))
@@ -29,10 +31,11 @@ class Worker():
                 if task.task_type == pb2.TaskType.map:
                     print("mapping")
                     self.state = "working"
-                    self.mapper.map(task.id, task.data, task.num_red_tasks)
+                    res = self.mapper.map(task.id, task.data, task.num_red_tasks)
+                    self.map_results = self.stub.finish_map_task(res)
                 elif task.task_type == pb2.TaskType.reduce:
                     self.state = "working"
-                    self.reducer.reduce(task.id)
+                    self.reducer.reduce(task.id, self.map_results)
                 elif task.task_type == pb2.TaskType.idle:
                     self.state = "idle"
                 else:

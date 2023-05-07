@@ -20,54 +20,53 @@ class Mapper():
 		except Exception as e:
 			pass
 		
+		map_results = {}
 		for chunk in chunks:
 			text = chunk.translate(str.maketrans('', '', string.punctuation)).lower()
 
 			for word in text.split():
 				bucket_id = ord(word[0]) % num_red_tasks
-				new_file = f'map_dirs/mr-{map_id}-{bucket_id}'
+				new_key = f'map_dirs/mr-{map_id}-{bucket_id}'
+				if new_key not in map_results:
+					map_results[new_key] = []
+				
+				map_results[new_key].append(word)
+		#print(map_results)
 
-				if new_file not in self.files:
-					self.files[new_file] = open(new_file, 'a')
-
-				words = self.files[new_file]
-				words.write(f'{word}\n')
-
-		for file in self.files.values():
-			file.close()
-		self.files = {}
+		res = pb2.MapResults()
+		for key, value in map_results.items():
+			w = pb2.WordList()
+			w.word_list.extend(value)
+			res.map_results[key].CopyFrom(w)
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
 			print("finishing")
-			stub.finish_map_task(pb2.Empty())
+			stub.finish_map_task(res)
+		return res
 
 class Reducer():
 	def __init__(self) -> None:
 		pass
 
-	def count_bucket(self, bucket_id):
+	def count_bucket(self, map_results):
 		counter = {}
-		for file in glob.glob(f'map_dirs/mr-*-{bucket_id}'):
-			with open(file) as f:
-				for word in f.readlines():
-					w = word.strip()
-					if w not in counter:
-						counter[w] = 0
-					counter[w] += 1
+		for container in map_results.map_results.values():
+			for word in container.word_list:
+				if word not in counter:
+					counter[word] = 0
+				counter[word] += 1
+		#print(counter)
 		return counter
 
-	def reduce(self, bucket_id):
-		try:
-			os.makedirs('out')
-		except:
-			pass
-		counts = self.count_bucket(bucket_id)
-		with open(f'out/out-{bucket_id}', 'a') as out:
-			for key, val in counts.items():
-				out.write(f'{key} {val}\n')
-			out.close()
+	def reduce(self, bucket_id, map_results):
+		counts = self.count_bucket(map_results)
+		
+		reduce_res = pb2.ReduceResults()
+		for key, val in counts.items():
+			reduce_res.reduce_results[key] = val
+		reduce_res.bucket_id = bucket_id
 
 		with grpc.insecure_channel(SERVER_ADDRESS) as channel:
 			stub = MapReduceStub(channel)
-			stub.finish_reduce_task(pb2.Empty())
+			stub.finish_reduce_task(reduce_res)

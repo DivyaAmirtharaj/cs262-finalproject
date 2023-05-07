@@ -21,12 +21,12 @@ class MapReduceStub(object):
                 )
         self.finish_map_task = channel.unary_unary(
                 '/grpc.MapReduce/finish_map_task',
-                request_serializer=protos_dot_mapreduce__pb2.Empty.SerializeToString,
-                response_deserializer=protos_dot_mapreduce__pb2.Task.FromString,
+                request_serializer=protos_dot_mapreduce__pb2.MapResults.SerializeToString,
+                response_deserializer=protos_dot_mapreduce__pb2.MapResults.FromString,
                 )
         self.finish_reduce_task = channel.unary_unary(
                 '/grpc.MapReduce/finish_reduce_task',
-                request_serializer=protos_dot_mapreduce__pb2.Empty.SerializeToString,
+                request_serializer=protos_dot_mapreduce__pb2.ReduceResults.SerializeToString,
                 response_deserializer=protos_dot_mapreduce__pb2.Task.FromString,
                 )
         self.worker_down = channel.unary_unary(
@@ -73,12 +73,12 @@ def add_MapReduceServicer_to_server(servicer, server):
             ),
             'finish_map_task': grpc.unary_unary_rpc_method_handler(
                     servicer.finish_map_task,
-                    request_deserializer=protos_dot_mapreduce__pb2.Empty.FromString,
-                    response_serializer=protos_dot_mapreduce__pb2.Task.SerializeToString,
+                    request_deserializer=protos_dot_mapreduce__pb2.MapResults.FromString,
+                    response_serializer=protos_dot_mapreduce__pb2.MapResults.SerializeToString,
             ),
             'finish_reduce_task': grpc.unary_unary_rpc_method_handler(
                     servicer.finish_reduce_task,
-                    request_deserializer=protos_dot_mapreduce__pb2.Empty.FromString,
+                    request_deserializer=protos_dot_mapreduce__pb2.ReduceResults.FromString,
                     response_serializer=protos_dot_mapreduce__pb2.Task.SerializeToString,
             ),
             'worker_down': grpc.unary_unary_rpc_method_handler(
@@ -125,8 +125,8 @@ class MapReduce(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc.MapReduce/finish_map_task',
-            protos_dot_mapreduce__pb2.Empty.SerializeToString,
-            protos_dot_mapreduce__pb2.Task.FromString,
+            protos_dot_mapreduce__pb2.MapResults.SerializeToString,
+            protos_dot_mapreduce__pb2.MapResults.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -142,7 +142,7 @@ class MapReduce(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/grpc.MapReduce/finish_reduce_task',
-            protos_dot_mapreduce__pb2.Empty.SerializeToString,
+            protos_dot_mapreduce__pb2.ReduceResults.SerializeToString,
             protos_dot_mapreduce__pb2.Task.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
