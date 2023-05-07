@@ -2,11 +2,6 @@ import subprocess
 import time
 import os
 
-num_map_tasks = 3
-num_red_tasks = 2
-chunk_size = 100000
-num_workers = 2
-
 def run_process(num_map_tasks, num_red_tasks, chunk_size, num_workers):
     # Define the terminal commands to run
     server_command = f'python server.py -M {num_map_tasks} -N {num_red_tasks} -chunk {chunk_size}'
@@ -42,4 +37,13 @@ def run(chunk_size):
 run(1000)
 run(10000)
 run(100000)
+'''
+
+'''
+# Exmaple running of experiment, will open 3 worker terminals, and 1 server terminal and output the result to experiment_results
+num_map_tasks = 3
+num_red_tasks = 2
+chunk_size = 100000
+num_workers = 2
+run_process(num_map_tasks, num_red_tasks, chunk_size, num_workers)
 '''
