@@ -80,6 +80,10 @@ class Server(pb2_grpc.MapReduceServicer):
                     id = i % num_map_tasks
                     data_by_id[id].append(chunk)
                     chunk = f.read(self.chunk_size)
+        for i in range(num_map_tasks):
+            if i not in data_by_id.keys():
+                data_by_id[i].append(None)
+        print(data_by_id.keys())
         return data_by_id
 
     # returns the next map task given a certain worker id
@@ -103,6 +107,7 @@ class Server(pb2_grpc.MapReduceServicer):
         
         # records that this task was done by the given worker
         self.map_task_split[worker_id].append(task_id)
+        print(self.map_task_split)
         
         return pb2.Task(task_type=pb2.TaskType.map,
                             id=task_id,

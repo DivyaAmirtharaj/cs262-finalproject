@@ -54,6 +54,7 @@ class Reducer():
 		return counter
 
 	def reduce(self, bucket_id, map_results):
+		print(key for key in map_results.map_results.keys())
 		counts = self.count_bucket(map_results)
 		reduce_res = pb2.ReduceResults()
 		for key, val in counts.items():

@@ -34,8 +34,8 @@ def run(chunk_size):
                 run_process(num_map_tasks, num_red_tasks, chunk_size, num_workers)
 
 '''
-run(1000)
-run(10000)
+run(1000000)
+run(1000000)
 run(100000)
 '''
 
