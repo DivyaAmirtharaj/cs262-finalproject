@@ -28,7 +28,8 @@ class ServerTest(unittest.TestCase):
         assert(task.task_type == pb2.TaskType.map)
         assert(task.id == 0)
 
-        self.server.finish_map_task(pb2.Empty(), None)
+        word_list = pb2.WordList(word_list=["word"])
+        self.server.finish_map_task(pb2.MapResults(map_results={"1": word_list}), None)
         assert(self.server.task_count == 1)
     
     # Tests that the server correctly fills out the backlog if a worker dies                                                                                                                                            `
@@ -51,7 +52,7 @@ class ServerTest(unittest.TestCase):
         assert(task.task_type == pb2.TaskType.reduce)
         assert(task.id == 0)
 
-        self.server.finish_reduce_task(pb2.Empty(), None)
+        self.server.finish_reduce_task(pb2.ReduceResults(reduce_results={"1" : 0}, bucket_id=0), None)
 
         assert(self.server.task_count == 1)
     
