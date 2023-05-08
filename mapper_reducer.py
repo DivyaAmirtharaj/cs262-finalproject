@@ -12,15 +12,19 @@ class Mapper():
 	def __init__(self):
 		self.files = {}
 
-	# pass set of filenames 
+	# Map function to process chunks of data
 	def map(self, map_id, chunks, num_red_tasks, server_address): 
 		map_results = {}
 		for chunk in chunks:
+			# Clean up the chunk by removing punctuation and converting to lowercase
 			text = chunk.translate(str.maketrans('', '', string.punctuation)).lower()
 
 			for word in text.split():
+       			# Determine the bucket ID for the word
 				bucket_id = ord(word[0]) % num_red_tasks
 				new_key = f'map_dirs/mr-{map_id}-{bucket_id}'
+    
+                # Initialize the key if it does not exist in the map_results dictionary
 				if new_key not in map_results:
 					map_results[new_key] = []
 				
@@ -42,6 +46,7 @@ class Reducer():
 	def __init__(self) -> None:
 		pass
 
+    # Count the occurrences of words in the map results
 	def count_bucket(self, map_results):
 		counter = {}
 		for container in map_results.map_results.values():
@@ -52,6 +57,7 @@ class Reducer():
 				counter[word] += 1
 		return counter
 
+    # Reduce function to process a bucket of data
 	def reduce(self, bucket_id, map_results, server_address):
 		print(key for key in map_results.map_results.keys())
 		counts = self.count_bucket(map_results)
