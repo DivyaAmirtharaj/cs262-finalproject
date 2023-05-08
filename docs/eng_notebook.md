@@ -42,7 +42,16 @@ Presentation Feedback:
     - Chunking each file into little pieces: doing a line by line approach and truly doing parallel and equal processing
         - This is technically the best for load balancing and ensuring that each worker is super equally split
         - however, this had a super high overhead (like massive) and communication costs were really high, I anticipate this would be better if the file were actually massive or the actual computation took a long time but given what we’re doing its probably too granular?
-    - Chunking each file into larger pieces: the approach that ended up working for us
+    - experimented with three forms of chunking:
+        1. The original which takes the total number of files, assumes all the files are the same length and thus divides the number of files by the number of tasks
+            - shortcomings of this are that some files are likely much longer than others which means we’re not load balancing that well
+        2. Chunking each file into little pieces: doing a line by line approach and truly doing parallel and equal processing
+            - This is technically the best for load balancing and ensuring that each worker is super equally split
+            - however, this had a super high overhead (like massive) and communication costs were really high, we anticipate this would be better if the file were actually massive or the actual computation took a long time but given what we’re doing its probably too granular?
+        3. File-based chunking (mix of the two): im going file by file which means that longer files are processed in the same length of time as multiple smaller files rather than preemptively assigning files to each worker
+            - it’s better parallel processing and fault tolerance than 1 but worse than 2, but it seems better suited for our work since our computation isn’t intensive at all so we should also try and minimize communication costs
+            - at first glance it seems like the fastest
+    - Chunking each file into larger pieces: the approach that ended up working for us 
 
 - Fault Tolerance
     - Have the workers send a "goodbye" request when they go down to the server, so that the server is aware the worker is gone-- we used a similar approach in another pset
