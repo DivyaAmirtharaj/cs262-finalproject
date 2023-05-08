@@ -12,7 +12,7 @@ getting tests, and behavior upon worker death
 """
 class ServerTest(unittest.TestCase):
     def setUp(self):
-        self.server = Server(5, 3, [1, 2, 3])
+        self.server = Server(5, 3, 100000, [1, 2, 3])
     
     # Tests whether setup occurs correctly
     def test_server_setup(self):
